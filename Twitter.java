@@ -54,7 +54,7 @@ public class Twitter {
 		listener = new StatusListener() {
             @Override
             public void onStatus(Status status) {
-            	if(status.getLang().equals("fr")){
+            	if(status.getLang().equals("fr")){ //Langue du tweet
             		try {
 						Thread.currentThread().sleep(100);
 					} catch (InterruptedException e) {
@@ -97,7 +97,7 @@ public class Twitter {
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
 		try {
 			//Ouverture du fichier
 			InputStream ips=new FileInputStream(file); 
@@ -180,7 +180,7 @@ public class Twitter {
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
 		try(FileWriter fw = new FileWriter(file, true)){
 			fw.write(tweet);
 		} catch (IOException e) {
