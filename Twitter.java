@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +28,7 @@ import twitter4j.auth.AccessToken;
  * @author Mojann
  * @version 1.0
  */
-public class Twitter {
+public class Twitter{
 	protected static final long serialVersionUID = 1L;
 	private static twitter4j.TwitterStream twitterStream;
 	private static StatusListener listener;
@@ -41,8 +43,8 @@ public class Twitter {
 	public Twitter(){
 		//Initialise consumer_key, consumer_secret, access_token, access_token_secret
 		twitterStream = new TwitterStreamFactory().getInstance();
-		twitterStream.setOAuthConsumer("consumer_key", "consumer_secret");
-		AccessToken access = new AccessToken("access_token", "access_token_secret");
+		twitterStream.setOAuthConsumer("7VAFerzE30wfjid6DN9S4MUsW", "yNo7PoU5XDVAMghcXn7ViFgrf46OAltzWNPPPbjywIXlTCCqqk");
+		AccessToken access = new AccessToken("3095314972-y9OIZCcOBcD90y30An0dQbjDbW875n7AdyoheZL", "a08chPEdMY2UUbR55svHKQEkVeWLk9NRUJ5BswFD6b5Zu");
 		twitterStream.setOAuthAccessToken(access);
 	}
 	/**
@@ -54,7 +56,7 @@ public class Twitter {
 		listener = new StatusListener() {
             @Override
             public void onStatus(Status status) {
-            	if(status.getLang().equals("fr")){ //Langue du tweet
+            	if(status.getLang().equals("fr")){
             		try {
 						Thread.currentThread().sleep(100);
 					} catch (InterruptedException e) {
@@ -97,7 +99,7 @@ public class Twitter {
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
 		try {
 			//Ouverture du fichier
 			InputStream ips=new FileInputStream(file); 
@@ -146,11 +148,21 @@ public class Twitter {
 	 * Affiche les hashtags
 	 */
 	public void afficherHashtags(){
+		this.affinerListHashtag();
+		this.triList();
 		for(Tweet tweet:listHashtag){
 			if((tweet.getHashtag().charAt(0)=='#')){
 				System.out.println(tweet.getHashtag()+" : "+tweet.getNbCount());
 			}
 		}
+	}
+	
+	/**
+	 * Trie la liste des Hashtags
+	 */
+	public void triList(){
+		TweetComparator comp = new TweetComparator();
+		Collections.sort(listHashtag, comp);
 	}
 	
 	/**
@@ -180,11 +192,59 @@ public class Twitter {
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
 		try(FileWriter fw = new FileWriter(file, true)){
 			fw.write(tweet);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void affinerListHashtag(){
+		for(int i=0;i<listHashtag.size();i++){
+			Tweet tweet = listHashtag.get(i);
+			if(tweet.getHashtag().charAt(0)!= '#'){
+				listHashtag.remove(i);
+			}
+		}
+	}
+	
+	/**
+	 * Compte le nombre de tweets streamés
+	 * @return int
+	 */
+	public int countTweets(){
+		int nbTweets=0;
+		Date date = new Date();
+		String year = ""+(date.getYear()+1900);
+		String month = ""+(date.getMonth()+1);
+		String day = ""+date.getDate();
+		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		try {
+			//Ouverture du fichier
+			InputStream ips=new FileInputStream(file); 
+			//Lecture du fichier tweet par tweet
+			InputStreamReader ipsr=new InputStreamReader(ips);
+			BufferedReader br=new BufferedReader(ipsr);
+			String ligne = "";
+			try {
+				while((ligne=br.readLine()) != null){
+					nbTweets++;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}catch(FileNotFoundException e){
+			e.printStackTrace();
+		}
+		return nbTweets;
+	}
+	
+	/**
+	 * Compte le nombre de Hashtag
+	 * @return int
+	 */
+	public int countHashtag(){
+		return listHashtag.size();
 	}
 }

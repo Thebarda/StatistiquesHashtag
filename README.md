@@ -16,4 +16,5 @@ Vous aurez également à ajouter des fichiers 'jar' externes.
 
 ### Remerciements
 Merci à l'API Twitter4j pour le stream des tweets -> [Lien vers le site web](http://twitter4j.org/en/index.html)
+
 Merci à json-lib pour tout ce qui partie json du code -> [Lien vers le site web](http://json-lib.sourceforge.net)

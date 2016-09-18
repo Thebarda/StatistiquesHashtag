@@ -8,5 +8,7 @@ public class StartStream {
 		//twitter.startStream(); //Exécuter cette ligne pour récupérer les tweets
 		twitter.lireFichier(); //Exécuter les deux lignes suivante pour afficher les stats des hashtags
 		twitter.afficherHashtags();
+		System.out.println("NOMBRE DE HASHTAG : "+twitter.countHashtag());
+		System.out.println("NOMBRE DE TWEETS : "+twitter.countTweets());
 	}
 }
