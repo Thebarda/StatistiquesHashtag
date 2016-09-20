@@ -1,5 +1,17 @@
 # StatistiquesHashtag
 ## Version 1.0
+
+## Version 1.1 
+- Triage des hashtags par occurences
+- Affichage du nombre tweets/hashtags streamés
+
+## Version 1.2
+- La lecture et les affichages sont regroupés en une méthode "afficherResultat"
+
+## Version 1.3
+- Ajout de stats de ratio "Retweets/tweets" et "Hashtags/tweets"
+- 
+
 ## Description
 
 Ce programme permet de faire des statistiques sur les différents hashtags utilisés sur les tweets français
@@ -17,4 +29,4 @@ Vous aurez également à ajouter des fichiers 'jar' externes.
 ### Remerciements
 Merci à l'API Twitter4j pour le stream des tweets -> [Lien vers le site web](http://twitter4j.org/en/index.html)
 
-Merci à json-lib pour tout ce qui partie json du code -> [Lien vers le site web](http://json-lib.sourceforge.net)
+Merci à json-lib pour tout ce qui est json -> [Lien vers le site web](http://json-lib.sourceforge.net)

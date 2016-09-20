@@ -99,7 +99,7 @@ public class Twitter{
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
 		try {
 			//Ouverture du fichier
 			InputStream ips=new FileInputStream(file); 
@@ -192,7 +192,7 @@ public class Twitter{
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
 		try(FileWriter fw = new FileWriter(file, true)){
 			fw.write(tweet);
 		} catch (IOException e) {
@@ -210,6 +210,19 @@ public class Twitter{
 	}
 	
 	/**
+	 * Affiche le résultat de la lecture du json et d'affichage des stats des Hashtags
+	 */
+	public void affichageResultat(){
+		this.lireFichier();
+		this.afficherHashtags();
+		System.out.println("NOMBRE DE HASHTAG : "+this.countHashtag());
+		System.out.println("NOMBRE DE TWEETS : "+this.countTweets());
+		System.out.println("NOMBRE DE RETWEETS : "+this.getNbRT());
+		System.out.println("RATIO RETWEETS / TWEETS : "+this.getRatioRetweetsSurTweets()+"%");
+		System.out.println("RATIO HASHTAGS / TWEETS : "+this.getRatioHashtagsSurTweets()+"%");
+	}
+	
+	/**
 	 * Compte le nombre de tweets streamés
 	 * @return int
 	 */
@@ -219,7 +232,7 @@ public class Twitter{
 		String year = ""+(date.getYear()+1900);
 		String month = ""+(date.getMonth()+1);
 		String day = ""+date.getDate();
-		String file = "C:\\Users\\Public\\Documents"+year+month+day+".json";
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
 		try {
 			//Ouverture du fichier
 			InputStream ips=new FileInputStream(file); 
@@ -246,5 +259,62 @@ public class Twitter{
 	 */
 	public int countHashtag(){
 		return listHashtag.size();
+	}
+	
+	/**
+	 * Retourne le nombre de retweets
+	 * @return int
+	 */
+	public int getNbRT(){
+		int nbRT = 0;
+		Date date = new Date();
+		String year = ""+(date.getYear()+1900);
+		String month = ""+(date.getMonth()+1);
+		String day = ""+date.getDate();
+		String file = "C:\\Users\\Public\\Documents\\tweets"+year+month+day+".json";
+		try {
+			//Ouverture du fichier
+			InputStream ips=new FileInputStream(file); 
+			//Lecture du fichier tweet par tweet
+			InputStreamReader ipsr=new InputStreamReader(ips);
+			BufferedReader br=new BufferedReader(ipsr);
+			String ligne;
+			//Tant qu'il reste des tweets à lire dans le fichier
+			while((ligne=br.readLine())!=null){
+				JSONObject obj; //on convertit la chaine en JsonObjet
+				try {
+					obj = new JSONObject(ligne);
+					String text = (String) obj.get("tweet");
+					String mots[] = text.split(" "); //Tableau qui contient chaque mot
+					if(mots[0].equals("RT")){
+						nbRT++;
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return nbRT;
+	}
+	
+	/**
+	 * Retourne le ratio de retweets sur le nombre de tweets
+	 * @return double
+	 */
+	public double getRatioRetweetsSurTweets(){
+		double res = (this.getNbRT()/(double)this.countTweets())*100;
+		return res;
+	}
+	
+	/**
+	 * Retourne le ratio de hashtags sur le nombre de tweets
+	 * @return double
+	 */
+	public double getRatioHashtagsSurTweets(){
+		double res = (this.countHashtag()/(double)this.countTweets())*100;
+		return res;
 	}
 }
