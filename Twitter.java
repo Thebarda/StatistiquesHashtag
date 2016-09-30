@@ -2,6 +2,7 @@ package twitter;
 
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -13,8 +14,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import twitter4j.JSONArray;
 import twitter4j.JSONException;
 import twitter4j.JSONObject;
 import twitter4j.StallWarning;
@@ -23,12 +29,13 @@ import twitter4j.StatusDeletionNotice;
 import twitter4j.StatusListener;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.auth.AccessToken;
+
 /**
  * Classe qui stream des tweets français, les enregistre dans un fichier JSON classé par date d'exécution et fait des stats des hashtags
  * @author Mojann
  * @version 1.0
  */
-public class Twitter{
+public class Twitter extends Thread{
 	protected static final long serialVersionUID = 1L;
 	private static twitter4j.TwitterStream twitterStream;
 	private static StatusListener listener;
@@ -43,8 +50,8 @@ public class Twitter{
 	public Twitter(){
 		//Initialise consumer_key, consumer_secret, access_token, access_token_secret
 		twitterStream = new TwitterStreamFactory().getInstance();
-		twitterStream.setOAuthConsumer("7VAFerzE30wfjid6DN9S4MUsW", "yNo7PoU5XDVAMghcXn7ViFgrf46OAltzWNPPPbjywIXlTCCqqk");
-		AccessToken access = new AccessToken("3095314972-y9OIZCcOBcD90y30An0dQbjDbW875n7AdyoheZL", "a08chPEdMY2UUbR55svHKQEkVeWLk9NRUJ5BswFD6b5Zu");
+		twitterStream.setOAuthConsumer("your consumer key", "your consumer secret");
+		AccessToken access = new AccessToken("your access token", "your access secret");
 		twitterStream.setOAuthAccessToken(access);
 	}
 	/**
@@ -56,12 +63,7 @@ public class Twitter{
 		listener = new StatusListener() {
             @Override
             public void onStatus(Status status) {
-            	if(status.getLang().equals("fr")){
-            		try {
-						Thread.currentThread().sleep(100);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+            	if(status.getLang().equals("en")){
             		user = status.getUser().getScreenName();
             		text = status.getText();
             		setJson(status);
@@ -215,6 +217,7 @@ public class Twitter{
 	public void affichageResultat(){
 		this.lireFichier();
 		this.afficherHashtags();
+		this.enregistrerStatsDansFichier();
 		System.out.println("NOMBRE DE HASHTAG : "+this.countHashtag());
 		System.out.println("NOMBRE DE TWEETS : "+this.countTweets());
 		System.out.println("NOMBRE DE RETWEETS : "+this.getNbRT());
@@ -316,5 +319,56 @@ public class Twitter{
 	public double getRatioHashtagsSurTweets(){
 		double res = (this.countHashtag()/(double)this.countTweets())*100;
 		return res;
+	}
+	
+	/**
+	 * Enregistre les stats dans un fichier en json
+	 */
+	public void enregistrerStatsDansFichier(){
+		JSONParser parser = new JSONParser();
+		try {
+			File file = new File("C:\\Users\\Public\\Documents\\statistiquesTweetsGeneral.json");
+			Date date = new Date();
+			int thisDate = date.getDate();
+			int thisMonth = date.getMonth();
+			int thisYear = date.getYear();
+			long dateLastModified = file.lastModified();
+			Date dateModif = new Date(dateLastModified);
+			int dayModif = dateModif.getDate();
+			int monthModif = dateModif.getMonth();
+			int yearModif = dateModif.getYear();
+			if((thisDate == dayModif)&&(thisMonth == monthModif)&&(thisYear == yearModif)){
+				System.out.println("FICHIER DEJA MODIFIE AUJOURD'HUI");
+			}else{
+				FileReader filer = new FileReader("C:\\Users\\Public\\Documents\\statistiquesTweetsGeneral.json");
+				Object obj = parser.parse(filer);
+				org.json.simple.JSONObject jObj = (org.json.simple.JSONObject) obj;
+				org.json.simple.JSONArray nbTweets = (org.json.simple.JSONArray) jObj.get("nbTweets");
+				nbTweets.add(this.countTweets());
+				org.json.simple.JSONArray nbRT = (org.json.simple.JSONArray) jObj.get("nbRetweets");
+				nbRT.add(this.getNbRT());
+				org.json.simple.JSONArray nbHashtags = (org.json.simple.JSONArray) jObj.get("nbHashtags");
+				nbHashtags.add(this.countHashtag());
+				org.json.simple.JSONArray ratioRTSurT = (org.json.simple.JSONArray) jObj.get("ratioRetweetsSurTweets");
+				ratioRTSurT.add(this.getRatioRetweetsSurTweets());
+				org.json.simple.JSONArray rationHashtagsSurTweets = (org.json.simple.JSONArray) jObj.get("rationHashtagsSurTweets");
+				rationHashtagsSurTweets.add(this.getRatioHashtagsSurTweets());
+				jObj.replace("nbTweets", nbTweets);
+				jObj.replace("nbRetweets", nbRT);
+				jObj.replace("nbHashtags", nbHashtags);
+				jObj.replace("ratioRetweetsSurTweets", ratioRTSurT);
+				jObj.replace("rationHashtagsSurTweets", rationHashtagsSurTweets);
+				FileWriter filew = new FileWriter("C:\\Users\\Public\\Documents\\statistiquesTweetsGeneral.json");
+				filew.flush();
+				filew.write(jObj.toJSONString());
+				filew.close();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
 	}
 }

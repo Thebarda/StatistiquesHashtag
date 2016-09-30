@@ -10,7 +10,6 @@
 
 ## Version 1.3
 - Ajout de stats de ratio "Retweets/tweets" et "Hashtags/tweets"
-- 
 
 ## Description
 
